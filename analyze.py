@@ -212,8 +212,8 @@ if __name__ == "__main__":
     '''
     gold_BUG
     '''
-    # train_dataset, eval_dataset = get_tokenized_dataset("data/s_gold_BUG.csv")
-    train_dataset, eval_dataset = get_tokenized_dataset("data/s_full_BUG.csv")
+    train_dataset, eval_dataset = get_tokenized_dataset("data/s_gold_BUG.csv")
+    # train_dataset, eval_dataset = get_tokenized_dataset("data/s_full_BUG.csv")
 
     train_dataloader = DataLoader(
         train_dataset, shuffle=True, batch_size=BATCH_SIZE)
@@ -221,25 +221,31 @@ if __name__ == "__main__":
         eval_dataset, batch_size=BATCH_SIZE)
 
     '''
-    vanilla BERT prediction
+    vanilla DistillBERT prediction
+    '''
+    model = AutoModelForMaskedLM.from_pretrained("bert-base-uncased").to(device)
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+    
+    '''
+    vanilla DistillBERT prediction
     '''
     # model = AutoModelForMaskedLM.from_pretrained(model_name).to(device)
     # tokenizer = AutoTokenizer.from_pretrained(model_name)
     
     '''
-    finetuend BERT prediction
+    finetuned DistillBERT prediction
     '''
-    # model = load_finetuned("models/anti_full_BERT_5.pt").to(device)
-    # tokenizer = AutoTokenizer.from_pretrained(model_name) 
+    model = load_finetuned("models/attention/intervened_full_BERT_all.pt").to(device)
+    tokenizer = AutoTokenizer.from_pretrained(model_name) 
     
     '''
     interevene attention layers (single layer)
     ''' 
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    for i in range(5):
-        print("Intervening {}th attention layer".format(i))
-        model = load_finetuned("models/intervened_full_BERT_singleblock_{}.pt".format(i)).to(device)
-        analyze_bias(eval_dataloader, model, tokenizer, "data/attention/attention_bert_prediction_full_{}.csv".format(i), device=device)
+    # tokenizer = AutoTokenizer.from_pretrained(model_name)
+    # for i in range(5):
+    #     print("Intervening {}th attention layer".format(i))
+    #     model = load_finetuned("models/intervened_full_BERT_singleblock_{}.pt".format(i)).to(device)
+    #     analyze_bias(eval_dataloader, model, tokenizer, "data/attention/attention_bert_prediction_full_{}.csv".format(i), device=device)
         
     
 
@@ -252,7 +258,8 @@ if __name__ == "__main__":
     # mask_token_logits = token_logits[0, mask_token_index, :]
     
     # input = next(iter(eval_dataloader))
-    # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
+    analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_real_bert_prediction.csv")
     # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
     # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction_full.csv")
     # analyze_bias(eval_dataloader, model, tokenizer, "data/finetuned_bert_prediction_full.csv")
+    # analyze_bias(eval_dataloader, model, tokenizer, "data/intervene_bert_prediction_gold.csv")
