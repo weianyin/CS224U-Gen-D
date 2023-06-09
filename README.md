@@ -16,8 +16,8 @@ Study the gender-bias information distribution in mini-Bert layers
 3. Does not detect/consider implicit bias
 4. 
 **TODO**
-1. Switch all attention weights from anti-model to the vanilla model
+1. (Done)Switch all attention weights from anti-model to the vanilla model
 2. Change only partial weights from individual attention blocks
-3. Fine tune using full dataset
+3. (DONE)Fine tune using full dataset
 4. hyperparameter tuning?
 5. BERT of another size
