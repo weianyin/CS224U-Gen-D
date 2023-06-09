@@ -13,11 +13,11 @@ Study the gender-bias information distribution in mini-Bert layers
 **Limitations**
 1. BERT cannot predict pronouns 
 2. We only considered "he" and "she", but a desired prediction is "them" 
-
+3. Does not detect/consider implicit bias
+4. 
 **TODO**
 1. Switch all attention weights from anti-model to the vanilla model
 2. Change only partial weights from individual attention blocks
 3. Fine tune using full dataset
 4. hyperparameter tuning?
 5. BERT of another size
-6. Does not detect/consider implicit bias
