@@ -20,4 +20,4 @@ Study the gender-bias information distribution in mini-Bert layers
 3. Fine tune using full dataset
 4. hyperparameter tuning?
 5. BERT of another size
-6.
+6. Does not detect/consider implicit bias
