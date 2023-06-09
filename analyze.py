@@ -24,6 +24,7 @@ masculine_pronoun = ["he", "him", "himself", "his"]
 feminine_pronoun = ["she", "her", "herself", "hers"]
 BATCH_SIZE = 16
 device = torch.device('cuda')
+mps_device = torch.device("mps")
 
 """
 Data Preparation
@@ -134,7 +135,7 @@ def get_pronoun(tokenizer, idx):
 
 
 
-def analyze_bias(eval_dataloader, model, tokenizer, to_csv_file):
+def analyze_bias(eval_dataloader, model, tokenizer, to_csv_file, device=device):
     sentences = []
     stereo_prob = []
     anti_prob = []
@@ -203,6 +204,9 @@ def analyze_bias(eval_dataloader, model, tokenizer, to_csv_file):
 
     df_result = pd.DataFrame({"sentences": sentences, "stereo_prob": stereo_prob, "anti-stereo_prob": anti_prob})
     df_result.to_csv(to_csv_file)
+
+def load_finetuned(path):
+    return AutoModelForMaskedLM.from_pretrained(path)
     
 
 if __name__ == "__main__":
@@ -213,9 +217,14 @@ if __name__ == "__main__":
     eval_dataloader = DataLoader(
         eval_dataset, batch_size=BATCH_SIZE)
 
-
-    model = AutoModelForMaskedLM.from_pretrained(model_name).to(device)
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    '''
+    vanilla BERT predction
+    '''
+    # model = AutoModelForMaskedLM.from_pretrained(model_name).to(device)
+    # tokenizer = AutoTokenizer.from_pretrained(model_name)
+    
+    model = load_finetuned("models/anti_BERT_3.pt").to(mps_device)
+    tokenizer = AutoTokenizer.from_pretrained(model_name) 
 
     # text = "Hello, my dog is cute [MASK]"
 
@@ -226,5 +235,6 @@ if __name__ == "__main__":
     # mask_token_logits = token_logits[0, mask_token_index, :]
     
     # input = next(iter(eval_dataloader))
-    analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
-    analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
+    # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
+    # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
+    analyze_bias(eval_dataloader, model, tokenizer, "data/finetuned_bert_prediction.csv", device=mps_device)
