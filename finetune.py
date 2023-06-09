@@ -110,8 +110,8 @@ def get_args():
 
 if __name__ == "__main__":
     args = get_args()
-    # if args.use_gpu:
-    #     print("Use GPU")
+    if args.use_gpu:
+        print("Use GPU")
     train_dataset, eval_dataset = get_tokenized_dataset("data/anti_gold_BUG.csv", 
                                                         testall=False, test_size=args.test_size)
 
@@ -120,8 +120,8 @@ if __name__ == "__main__":
     eval_dataloader = DataLoader(
         eval_dataset, batch_size=BATCH_SIZE)
     
-    # device = torch.device('cuda') if args.use_gpu else torch.device('cpu')
-    device = torch.device('cpu')
+    device = torch.device('cuda') if args.use_gpu else torch.device('cpu')
+    # device = torch.device('cpu')
     
     model = AutoModelForMaskedLM.from_pretrained(model_name).to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
