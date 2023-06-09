@@ -22,9 +22,9 @@ def generate_datasets(fname, save=False):
     # full: 105687 29480 22867 53340
     
     if save:
-        anti_df.to_csv("data/anti_" + fname)
-        neutral_df.to_csv("data/neutral_" + fname)
-        s_df.to_csv("data/s_" + fname)
+        anti_df.to_csv("data/anti_" + fname.split("/")[-1])
+        neutral_df.to_csv("data/neutral_" + fname.split("/")[-1])
+        s_df.to_csv("data/s_" + fname.split("/")[-1])
 
 
 def mask_pronoun(df):
@@ -77,5 +77,5 @@ def get_tokenized_dataset(fname, tokenizer=None):
 
 if __name__ == "__main__":
     # get_tokenized_dataset("data/gold_BUG.csv")
-    generate_datasets("data/gold_BUG.csv")
+    generate_datasets("data/gold_BUG.csv", save=True)
     # generate_datasets("data/full_BUG.csv")
