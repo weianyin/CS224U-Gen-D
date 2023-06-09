@@ -35,6 +35,7 @@ def mask_pronoun(dataset):
     labels = [x['g'] for x in dataset]
     sent_ids = [x['uid'] for x in dataset]
 
+
     # masked_sents = [re.sub(rf"\b({pronoun})\b", "[MASK]", sent) for sent, pronoun in zip(sents, labels)]
     masked_sents = []
     for sent, id in zip(tokenized_sents, mask_index):
@@ -208,15 +209,19 @@ model.save_pretrained("models/anti_BERT")
 
 
 # input = next(iter(eval_dataloader))
+sentences = []
+stereo_prob = []
+anti_prob = []
 for input in eval_dataloader:
     outputs = model(input_ids=input['input_ids'].to(device), attention_mask=input['attention_mask'].to(device), labels=input['labels'].to(device)).logits
     mask_token_index = torch.where(input["input_ids"] == tokenizer.mask_token_id)[1]
     # itereate through the batch
     for i in range(len(input["input_ids"])):
-        print("{}th sentence".format(i))
-        print(input["text"][i])
+        sentences.append(input["text"][i])
+        # print("{}th sentence".format(i))
+        # print(input["text"][i])
         mask_token_logits = outputs[i, mask_token_index[i], :] # 30522 dim
-        probs = torch.nn.functional.softmax(mask_token_index)
+        probs = torch.nn.functional.softmax(mask_token_logits)
         # Pick the [MASK] candidates with the highest logits
         # top_2_tokens = torch.topk(mask_token_logits, 2, dim=0).indices.tolist()
         # top_k_weights, top_k_tokens = torch.topk(mask_token_logits, 2, dim=0, sorted=True)
@@ -230,8 +235,8 @@ for input in eval_dataloader:
 
         # opposite_label = pronoun_pairs[label]
         # opposite_label_idx = tokenizer.convert_tokens_to_ids([opposite_label])
-        # label_prob = mask_token_logits[label_idx].item()
-        # opposite_label_prob = mask_token_logits[opposite_label_idx].item()
+        # label_prob = probs[label_idx].item()
+        # opposite_label_prob = probs[opposite_label_idx].item()
 
         # # print(input["text"][i])
         # # print(input["pronoun"][i])
@@ -265,5 +270,10 @@ for input in eval_dataloader:
                 token_idx = tokenizer.convert_tokens_to_ids([token])
                 label_prob += probs[token_idx].item()
 
-        print("Stereotyped has probability {}".format(label_prob / (label_prob + opposite_label_prob)))
-        print("Anti-Steretyped has probability {}".format(opposite_label_prob / (label_prob + opposite_label_prob)))
+        # print("Stereotyped has probability {}".format(label_prob / (label_prob + opposite_label_prob)))
+        # print("Anti-Steretyped has probability {}".format(opposite_label_prob / (label_prob + opposite_label_prob)))
+        stereo_prob.append(label_prob / (label_prob + opposite_label_prob))
+        anti_prob.append(opposite_label_prob / (label_prob + opposite_label_prob))
+
+df_result = pd.DataFrame({"sentences": sentences, "stereo_prob": stereo_prob, "anti-stereo_prob": anti_prob})
+df_result.to_csv("data/vanilla_bert_prediction.csv")
