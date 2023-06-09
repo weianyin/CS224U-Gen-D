@@ -12,7 +12,6 @@ from tqdm.auto import tqdm
 import math
 from accelerate import Accelerator
 
-device = 'mps'
 
 """
 Parameters
@@ -24,7 +23,7 @@ pronoun_pairs = {"he": "she", "she": "he", "him": "her", "her": "him",
 masculine_pronoun = ["he", "him", "himself", "his"]
 feminine_pronoun = ["she", "her", "herself", "hers"]
 BATCH_SIZE = 16
-
+device = torch.device('cuda')
 
 """
 Data Preparation

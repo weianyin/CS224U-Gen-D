@@ -30,15 +30,9 @@ def generate_datasets(fname, save=False):
     # full: 105687 29480 22867 53340
     
     if save:
-<<<<<<< Updated upstream
         anti_df.to_csv("data/anti_" + fname.split("/")[-1])
         neutral_df.to_csv("data/neutral_" + fname.split("/")[-1])
         s_df.to_csv("data/s_" + fname.split("/")[-1])
-=======
-        anti_df.to_csv("data/" + "anti_"+fname)
-        neutral_df.to_csv("data/" + "neutral_" + fname)
-        s_df.to_csv("data/" + "s_" + fname)
->>>>>>> Stashed changes
 
 
 def mask_pronoun(df):
@@ -207,23 +201,6 @@ def model_test_eval(dataloader, model, device):
     # return y_pred, sents, sent_ids
 
 if __name__ == "__main__":
-<<<<<<< Updated upstream
     # get_tokenized_dataset("data/gold_BUG.csv")
     generate_datasets("data/gold_BUG.csv", save=True)
     # generate_datasets("data/full_BUG.csv")
-=======
-    # get_tokenized_dataset("data/anti_gold_BUG.csv")
-    generate_datasets("data/gold_BUG.csv", save=True)
-    # generate_datasets("data/full_BUG.csv")
-    # get_masked_dataset("data/s_gold_BUG.csv")
-    # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    # model = AutoModelForMaskedLM.from_pretrained("distilbert-base-uncased")
-    # test_data = load_data("data/masked_s_gold_BUG.csv", flag="test")
-    # test_dataset = GenderTestDataset(test_data)
-    # test_dataloader = DataLoader(test_dataset, shuffle=False, batch_size=8,
-    #                                 collate_fn=test_dataset.collate_fn)
-    
-    # model_test_eval(test_dataloader, model, device)
-    # for step, batch in enumerate(tqdm(test_dataloader, desc=f'eval', disable=False)):
-    #     print(batch)
->>>>>>> Stashed changes
