@@ -12,4 +12,4 @@ Study the gender-bias information distribution in mini-Bert layers
 
 **Limitations**
 1. BERT cannot predict pronouns 
-2. 
+2. We only considered "he" and "she", but a desired prediction is "them" 
