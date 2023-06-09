@@ -22,13 +22,27 @@ from analyze import get_tokenized_dataset
 """
 Parameters
 """
-NUM_TRAIN_EPOCHS = 10
+NUM_TRAIN_EPOCHS = 5
 LEARNING_RATE = 2e-5
 from analyze import BATCH_SIZE, model_name
 
 def finetune(model, train_dataloader, eval_dataloader, device):
     # TODO: Only update attention parameters
-    optimizer = AdamW(model.parameters(), lr=LEARNING_RATE)
+    trainable_layers = [
+        model.distilbert.transformer.layer[0].attention,
+        model.distilbert.transformer.layer[1].attention,
+        model.distilbert.transformer.layer[2].attention,
+        model.distilbert.transformer.layer[3].attention,
+        model.distilbert.transformer.layer[4].attention,
+        model.distilbert.transformer.layer[5].attention,
+    ]
+
+    trainable_params = []
+    for layer in trainable_layers:
+        trainable_params += list(layer.parameters())
+
+    # optimizer = AdamW(model.parameters(), lr=LEARNING_RATE)
+    optimizer = AdamW(trainable_params, lr=LEARNING_RATE)
     accelerator = Accelerator()
     model, optimizer, train_dataloader, eval_dataloader = accelerator.prepare(
         model, optimizer, train_dataloader, eval_dataloader
@@ -80,7 +94,7 @@ def finetune(model, train_dataloader, eval_dataloader, device):
 
         print(f">>> Epoch {epoch}: Perplexity: {perplexity}, Loss: {torch.mean(losses)}")
 
-    model.save_pretrained("models/anti_BERT")
+        model.save_pretrained("models/anti_BERT_%s.pt" % epoch)
     return 0
 
 
@@ -96,8 +110,8 @@ def get_args():
 
 if __name__ == "__main__":
     args = get_args()
-    if args.use_gpu:
-        print("Use GPU")
+    # if args.use_gpu:
+    #     print("Use GPU")
     train_dataset, eval_dataset = get_tokenized_dataset("data/anti_gold_BUG.csv", 
                                                         testall=False, test_size=args.test_size)
 
@@ -106,9 +120,14 @@ if __name__ == "__main__":
     eval_dataloader = DataLoader(
         eval_dataset, batch_size=BATCH_SIZE)
     
-    device = torch.device('cuda') if args.use_gpu else torch.device('cpu')
+    # device = torch.device('cuda') if args.use_gpu else torch.device('cpu')
+    device = torch.device('cpu')
     
     model = AutoModelForMaskedLM.from_pretrained(model_name).to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    
+
+    # print(torch.nn.Sequential(*(list(model.children()))))
+    # print(model.distilbert.transformer.layer.attention.parameters())
+
+
     finetune(model, train_dataloader, eval_dataloader, device)
