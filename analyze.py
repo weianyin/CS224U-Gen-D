@@ -40,7 +40,7 @@ def mask_pronoun(dataset):
     tokenized_sents = [x["tokens"] for x in dataset]
     mask_index = [x["g_first_index"] for x in dataset]
     labels = [x['g'] for x in dataset]
-    sent_ids = [x['uid'] for x in dataset]
+    # sent_ids = [x['uid'] for x in dataset]
 
     # masked_sents = [re.sub(rf"\b({pronoun})\b", "[MASK]", sent) for sent, pronoun in zip(sents, labels)]
     masked_sents = []
@@ -49,7 +49,7 @@ def mask_pronoun(dataset):
         sent[id] = "[MASK]"
         masked_sents.append(" ".join(sent))
 
-    return masked_sents, labels, sent_ids
+    return masked_sents, labels
 
 class PronounDataset(torch.utils.data.Dataset):
     def __init__(self, dataset, tokenizer):
@@ -62,7 +62,7 @@ class PronounDataset(torch.utils.data.Dataset):
     def __getitem__(self, item):
         data = self.dataset[item]
         # text = data['sentence_text'].lower().strip()
-        uid = data["uid"]
+        # uid = data["uid"]
         text = data["sentence_text"].strip()
         pronoun = data['g']
         corpus = data["corpus"]
@@ -96,8 +96,7 @@ class PronounDataset(torch.utils.data.Dataset):
             'pronoun': pronoun,
             'input_ids': encoding['input_ids'].flatten(),
             'attention_mask': encoding['attention_mask'].flatten(),
-            'labels': torch.tensor(labels.clone().detach(), dtype=torch.long),
-            "uid": uid
+            'labels': torch.tensor(labels.clone().detach(), dtype=torch.long)
         }
 
 def get_tokenized_dataset(fname, tokenizer=None, testall=True, test_size=0.2):
@@ -210,7 +209,11 @@ def load_finetuned(path):
     
 
 if __name__ == "__main__":
-    train_dataset, eval_dataset = get_tokenized_dataset("data/s_gold_BUG.csv")
+    '''
+    gold_BUG
+    '''
+    # train_dataset, eval_dataset = get_tokenized_dataset("data/s_gold_BUG.csv")
+    train_dataset, eval_dataset = get_tokenized_dataset("data/s_full_BUG.csv")
 
     train_dataloader = DataLoader(
         train_dataset, shuffle=True, batch_size=BATCH_SIZE)
@@ -218,13 +221,27 @@ if __name__ == "__main__":
         eval_dataset, batch_size=BATCH_SIZE)
 
     '''
-    vanilla BERT predction
+    vanilla BERT prediction
     '''
     # model = AutoModelForMaskedLM.from_pretrained(model_name).to(device)
     # tokenizer = AutoTokenizer.from_pretrained(model_name)
     
-    model = load_finetuned("models/anti_BERT_3.pt").to(mps_device)
-    tokenizer = AutoTokenizer.from_pretrained(model_name) 
+    '''
+    finetuend BERT prediction
+    '''
+    # model = load_finetuned("models/anti_full_BERT_5.pt").to(device)
+    # tokenizer = AutoTokenizer.from_pretrained(model_name) 
+    
+    '''
+    interevene attention layers (single layer)
+    ''' 
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    for i in range(5):
+        print("Intervening {}th attention layer".format(i))
+        model = load_finetuned("models/intervened_full_BERT_singleblock_{}.pt".format(i)).to(device)
+        analyze_bias(eval_dataloader, model, tokenizer, "data/attention/attention_bert_prediction_full_{}.csv".format(i), device=device)
+        
+    
 
     # text = "Hello, my dog is cute [MASK]"
 
@@ -237,4 +254,5 @@ if __name__ == "__main__":
     # input = next(iter(eval_dataloader))
     # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
     # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
-    analyze_bias(eval_dataloader, model, tokenizer, "data/finetuned_bert_prediction.csv", device=mps_device)
+    # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction_full.csv")
+    # analyze_bias(eval_dataloader, model, tokenizer, "data/finetuned_bert_prediction_full.csv")

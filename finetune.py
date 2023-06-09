@@ -26,7 +26,7 @@ NUM_TRAIN_EPOCHS = 5
 LEARNING_RATE = 2e-5
 from analyze import BATCH_SIZE, model_name
 
-def finetune(model, train_dataloader, eval_dataloader, device):
+def finetune(model, train_dataloader, eval_dataloader, device, args):
     # TODO: Only update attention parameters
     trainable_layers = [
         model.distilbert.transformer.layer[0].attention,
@@ -49,7 +49,7 @@ def finetune(model, train_dataloader, eval_dataloader, device):
     )
     
     num_update_steps_per_epoch = len(train_dataloader)
-    num_training_steps = NUM_TRAIN_EPOCHS * num_update_steps_per_epoch
+    num_training_steps = args.epochs * num_update_steps_per_epoch
 
     lr_scheduler = get_scheduler(
         "linear",
@@ -60,7 +60,7 @@ def finetune(model, train_dataloader, eval_dataloader, device):
 
     progress_bar = tqdm(range(num_training_steps))
 
-    for epoch in range(NUM_TRAIN_EPOCHS):
+    for epoch in range(args.epochs):
         # Training
         model.train()
         for batch in train_dataloader:
@@ -94,7 +94,8 @@ def finetune(model, train_dataloader, eval_dataloader, device):
 
         print(f">>> Epoch {epoch}: Perplexity: {perplexity}, Loss: {torch.mean(losses)}")
 
-        model.save_pretrained("models/anti_BERT_%s.pt" % epoch)
+        # model.save_pretrained("models/anti_BERT_%s.pt" % epoch)
+        model.save_pretrained("models/anti_full_BERT_%s.pt" % epoch)
     return 0
 
 
@@ -112,9 +113,15 @@ if __name__ == "__main__":
     args = get_args()
     if args.use_gpu:
         print("Use GPU")
-    train_dataset, eval_dataset = get_tokenized_dataset("data/anti_gold_BUG.csv", 
-                                                        testall=False, test_size=args.test_size)
+    '''
+    gold_BUG
+    '''
+    # train_dataset, eval_dataset = get_tokenized_dataset("data/anti_gold_BUG.csv", 
+    #                                                     testall=False, test_size=args.test_size)
 
+    train_dataset, eval_dataset = get_tokenized_dataset("data/anti_full_BUG.csv", 
+                                                        testall=False, test_size=args.test_size)
+    
     train_dataloader = DataLoader(
         train_dataset, shuffle=True, batch_size=BATCH_SIZE)
     eval_dataloader = DataLoader(
@@ -130,4 +137,4 @@ if __name__ == "__main__":
     # print(model.distilbert.transformer.layer.attention.parameters())
 
 
-    finetune(model, train_dataloader, eval_dataloader, device)
+    finetune(model, train_dataloader, eval_dataloader, device, args)

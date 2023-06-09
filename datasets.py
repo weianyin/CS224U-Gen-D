@@ -202,5 +202,5 @@ def model_test_eval(dataloader, model, device):
 
 if __name__ == "__main__":
     # get_tokenized_dataset("data/gold_BUG.csv")
-    generate_datasets("data/gold_BUG.csv", save=True)
+    generate_datasets("data/full_BUG.csv", save=True)
     # generate_datasets("data/full_BUG.csv")
