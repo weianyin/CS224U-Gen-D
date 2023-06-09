@@ -21,3 +21,6 @@ Study the gender-bias information distribution in mini-Bert layers
 3. (DONE)Fine tune using full dataset
 4. hyperparameter tuning?
 5. BERT of another size
+
+**Analysis TODO**
+1. compare finetuend bert result with vanilla bert result: if number of anti-stereotyped prediction increase, compare probabilities
