@@ -51,7 +51,7 @@ def main(anti_model_pt, method="singleblock"):
                 
             # Save model after all blocks have been changed
             to_model_pt = f"models/intervened_BERT_all.pt"
-            vanilla_model.save_pretrained(to_model_pt)
+            intervention_model.save_pretrained(to_model_pt)
             print(f"Saved intervened model from all blocks to {to_model_pt}")
                 
         elif method == "singleblock":
@@ -69,7 +69,7 @@ def main(anti_model_pt, method="singleblock"):
                 
                 # Save intervened model
                 to_model_pt = f"models/intervened_full_BERT_singleblock_{i}.pt"
-                vanilla_model.save_pretrained(to_model_pt)
+                intervention_model.save_pretrained(to_model_pt)
                 print(f"Saved intervened singleblock model to {to_model_pt}")
                 
                 # Revert change for changing next layer
@@ -99,7 +99,7 @@ def main(anti_model_pt, method="singleblock"):
                 
                 # Save intervened model
                 to_model_pt = f"models/intervened_full_BERT_accumulate_{i}.pt"
-                vanilla_model.save_pretrained(to_model_pt)
+                intervention_model.save_pretrained(to_model_pt)
                 print(f"Saved intervened accumulative model to {to_model_pt}")
                 # Keep change in the current layer to accumulate
                 
