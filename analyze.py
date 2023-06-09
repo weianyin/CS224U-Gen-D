@@ -229,18 +229,19 @@ if __name__ == "__main__":
     '''
     finetuned BERT prediction
     '''
-    model = load_finetuned("models/attention/intervened_full_BERT_all.pt").to(device)
-    tokenizer = AutoTokenizer.from_pretrained(model_name) 
+    # model = load_finetuned("models/attention/intervened_full_BERT_all.pt").to(device)
+    # tokenizer = AutoTokenizer.from_pretrained(model_name) 
     
     '''
     interevene attention layers (single layer)
     ''' 
-    # tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
     # for i in range(5):
     #     print("Intervening {}th attention layer".format(i))
-    #     model = load_finetuned("models/intervened_full_BERT_singleblock_{}.pt".format(i)).to(device)
-    #     analyze_bias(eval_dataloader, model, tokenizer, "data/attention/attention_bert_prediction_full_{}.csv".format(i), device=device)
-        
+    #     model = load_finetuned("models/attention/singleblock/intervened_full_BERT_singleblock_{}.pt".format(i)).to(device)
+    #     analyze_bias(eval_dataloader, model, tokenizer, "data/attention/attention_bert_prediction_gold_{}.csv".format(i), device=device)
+    model = load_finetuned("models/attention/singleblock/intervened_full_BERT_singleblock_5.pt").to(device)
+    analyze_bias(eval_dataloader, model, tokenizer, "data/attention/attention_bert_prediction_gold_5.csv", device=device)
     
 
     # text = "Hello, my dog is cute [MASK]"
@@ -256,4 +257,4 @@ if __name__ == "__main__":
     # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
     # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction_full.csv")
     # analyze_bias(eval_dataloader, model, tokenizer, "data/finetuned_bert_prediction_full.csv")
-    analyze_bias(eval_dataloader, model, tokenizer, "data/intervene_bert_prediction_gold.csv")
+    # analyze_bias(eval_dataloader, model, tokenizer, "data/intervene_bert_prediction_gold.csv")
