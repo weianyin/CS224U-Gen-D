@@ -25,3 +25,10 @@ Study the gender-bias information distribution in mini-Bert layers
 
 **Analysis TODO**
 1. compare finetuend bert result with vanilla bert result: if number of anti-stereotyped prediction increase, compare probabilities
+
+**Analysis Result**
+1. vanilla BERT is biased in its prediction
+2. finetuning vanilla BERT with large anti-stereo dataset has noticeable impact on its predictions.
+3. Full dataset contains much more stereo data, which might be a reflection on the dataset used to pretrain existing models
+
+
