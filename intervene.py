@@ -9,7 +9,7 @@ import argparse
 
 from analyze import model_name
 
-def main(anti_model_pt):
+def main(anti_model_pt, method="singleblock"):
     with torch.no_grad():
         device = torch.device('cuda') if args.use_gpu else torch.device('cpu')
         # saved = torch.load(anti_model_pt)
@@ -28,28 +28,81 @@ def main(anti_model_pt):
         
         vanilla_model = AutoModelForMaskedLM.from_pretrained(model_name)
         vanilla_model = vanilla_model.to(device)
-        print(f"Loaded vanilla model: {model_name}")
+        print(f"Loaded vanilla model for reference: {model_name}")
         vanilla0q = vanilla_model.distilbert.transformer.layer[0].attention.q_lin.weight
         
-        # Change weights in all 6 attention blocks of the vanilla model
-        for i in range(6):
-            vanilla_model.distilbert.transformer.layer[i].attention.q_lin.weight = \
-                anti_model.distilbert.transformer.layer[i].attention.q_lin.weight
-            vanilla_model.distilbert.transformer.layer[i].attention.k_lin.weight = \
-                anti_model.distilbert.transformer.layer[i].attention.k_lin.weight
-            vanilla_model.distilbert.transformer.layer[i].attention.v_lin.weight = \
-                anti_model.distilbert.transformer.layer[i].attention.v_lin.weight
-            vanilla_model.distilbert.transformer.layer[i].attention.out_lin.weight = \
-                anti_model.distilbert.transformer.layer[i].attention.out_lin.weight
-            assert((vanilla_model.distilbert.transformer.layer[i].attention.q_lin.weight == \
-                anti_model.distilbert.transformer.layer[i].attention.q_lin.weight).all())
-            # if (i == 0):
-            #     print("Mix-model weights:")
-            #     print(vanilla_model.distilbert.transformer.layer[0].attention.q_lin.weight)
-        to_model_pt = "models/intervened_BERT_3.pt"
-        vanilla_model.save_pretrained(to_model_pt)
-        print(f"Saved intervened model to {to_model_pt}")
-
+        intervention_model = AutoModelForMaskedLM.from_pretrained(model_name)
+        intervention_model = intervention_model.to(device)
+        print(f"Loaded vanilla model for intervention: {model_name}")
+        
+        if method == "changeall":
+            # Change weights in all 6 attention blocks of the vanilla model
+            for i in range(6):
+                intervention_model.distilbert.transformer.layer[i].attention.q_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.q_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.k_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.k_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.v_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.v_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.out_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.out_lin.weight
+                assert((intervention_model.distilbert.transformer.layer[i].attention.q_lin.weight == \
+                    anti_model.distilbert.transformer.layer[i].attention.q_lin.weight).all())
+                
+            # Save model after all blocks have been changed
+            to_model_pt = f"models/intervened_BERT_all.pt"
+            intervention_model.save_pretrained(to_model_pt)
+            print(f"Saved intervened model from all blocks to {to_model_pt}")
+                
+        elif method == "singleblock":
+            for i in range(6):
+                intervention_model.distilbert.transformer.layer[i].attention.q_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.q_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.k_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.k_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.v_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.v_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.out_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.out_lin.weight
+                assert((intervention_model.distilbert.transformer.layer[i].attention.q_lin.weight == \
+                    anti_model.distilbert.transformer.layer[i].attention.q_lin.weight).all())
+                
+                # Save intervened model
+                to_model_pt = f"models/intervened_full_BERT_singleblock_{i}.pt"
+                intervention_model.save_pretrained(to_model_pt)
+                print(f"Saved intervened singleblock model to {to_model_pt}")
+                
+                # Revert change for changing next layer
+                intervention_model.distilbert.transformer.layer[i].attention.q_lin.weight = \
+                    vanilla_model.distilbert.transformer.layer[i].attention.q_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.k_lin.weight = \
+                    vanilla_model.distilbert.transformer.layer[i].attention.k_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.v_lin.weight = \
+                    vanilla_model.distilbert.transformer.layer[i].attention.v_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.out_lin.weight = \
+                    vanilla_model.distilbert.transformer.layer[i].attention.out_lin.weight
+                assert((intervention_model.distilbert.transformer.layer[i].attention.v_lin.weight == \
+                    vanilla_model.distilbert.transformer.layer[i].attention.v_lin.weight).all())
+                
+        elif method == "accumulate":
+            for i in range(6):
+                intervention_model.distilbert.transformer.layer[i].attention.q_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.q_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.k_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.k_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.v_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.v_lin.weight
+                intervention_model.distilbert.transformer.layer[i].attention.out_lin.weight = \
+                    anti_model.distilbert.transformer.layer[i].attention.out_lin.weight
+                assert((intervention_model.distilbert.transformer.layer[i].attention.q_lin.weight == \
+                    anti_model.distilbert.transformer.layer[i].attention.q_lin.weight).all())
+                
+                # Save intervened model
+                to_model_pt = f"models/intervened_full_BERT_accumulate_{i}.pt"
+                intervention_model.save_pretrained(to_model_pt)
+                print(f"Saved intervened accumulative model to {to_model_pt}")
+                # Keep change in the current layer to accumulate
+                
 def get_args():
     parser = argparse.ArgumentParser()
     
@@ -63,5 +116,6 @@ if __name__ == "__main__":
     args = get_args()
     if args.use_gpu:
         print("Use GPU")
-    anti_model_pt = "models/anti_BERT_3.pt"
-    main(anti_model_pt)
+    anti_model_pt = "models/anti_full_BERT_5.pt"
+    main(anti_model_pt, method="singleblock")
+    main(anti_model_pt, method="accumulate")

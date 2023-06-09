@@ -21,6 +21,7 @@ Study the gender-bias information distribution in mini-Bert layers
 3. (DONE)Fine tune using full dataset
 4. hyperparameter tuning?
 5. BERT of another size
+6. Finetuning on a large amount of anti-stereo data seemed to teach the model to learn to predict anti-stereo answers. May consider train on balanced.
 
 **Analysis TODO**
 1. compare finetuend bert result with vanilla bert result: if number of anti-stereotyped prediction increase, compare probabilities
