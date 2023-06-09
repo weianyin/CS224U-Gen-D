@@ -25,9 +25,9 @@ def generate_datasets(fname, save=False):
     print(df.head())
     print(len(df), len(anti_df), len(neutral_df), len(s_df))
     fname = fname[5:]
-    # gold: 1717 420 434 863
-    # balanced: 25504 12752 0 12752
-    # full: 105687 29480 22867 53340
+    # gold: 1113 235 331 547
+    # balanced: 13951 6888 0 7063
+    # full: 64299 16381 16691 31227
     
     if save:
         anti_df.to_csv("data/anti_" + fname.split("/")[-1])
@@ -199,7 +199,7 @@ def model_test_eval(dataloader, model, device):
     #     sent_ids.extend(b_sent_ids)
 
     # return y_pred, sents, sent_ids
-
+    
 if __name__ == "__main__":
     # get_tokenized_dataset("data/gold_BUG.csv")
     generate_datasets("data/gold_BUG.csv", save=True)
