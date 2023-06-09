@@ -47,7 +47,7 @@ class BertClassifierModule(nn.Module):
     
 
 def train():
-    pass
+    device = torch.device('cuda') if args.use_gpu else torch.device('cpu')
 
 if __name__ == "__main__":
     train()
