@@ -17,14 +17,14 @@ from tqdm.auto import tqdm
 import math
 from accelerate import Accelerator
 
-from just_eval import get_tokenized_dataset
+from analyze import get_tokenized_dataset
 
 """
 Parameters
 """
 NUM_TRAIN_EPOCHS = 10
 LEARNING_RATE = 2e-5
-from just_eval import BATCH_SIZE, model_name
+from analyze import BATCH_SIZE, model_name
 
 def finetune(model, train_dataloader, eval_dataloader, device):
     # TODO: Only update attention parameters
