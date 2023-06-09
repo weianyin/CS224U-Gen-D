@@ -221,13 +221,19 @@ if __name__ == "__main__":
         eval_dataset, batch_size=BATCH_SIZE)
 
     '''
-    vanilla BERT prediction
+    vanilla DistillBERT prediction
+    '''
+    model = AutoModelForMaskedLM.from_pretrained("bert-base-uncased").to(device)
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+    
+    '''
+    vanilla DistillBERT prediction
     '''
     # model = AutoModelForMaskedLM.from_pretrained(model_name).to(device)
     # tokenizer = AutoTokenizer.from_pretrained(model_name)
     
     '''
-    finetuned BERT prediction
+    finetuned DistillBERT prediction
     '''
     model = load_finetuned("models/attention/intervened_full_BERT_all.pt").to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_name) 
@@ -252,8 +258,8 @@ if __name__ == "__main__":
     # mask_token_logits = token_logits[0, mask_token_index, :]
     
     # input = next(iter(eval_dataloader))
-    # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
+    analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_real_bert_prediction.csv")
     # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction.csv")
     # analyze_bias(eval_dataloader, model, tokenizer, "data/vanilla_bert_prediction_full.csv")
     # analyze_bias(eval_dataloader, model, tokenizer, "data/finetuned_bert_prediction_full.csv")
-    analyze_bias(eval_dataloader, model, tokenizer, "data/intervene_bert_prediction_gold.csv")
+    # analyze_bias(eval_dataloader, model, tokenizer, "data/intervene_bert_prediction_gold.csv")
