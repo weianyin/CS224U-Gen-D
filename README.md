@@ -16,12 +16,12 @@ Study the gender-bias information distribution in mini-Bert layers
 3. Does not detect/consider implicit bias
 4. 
 **TODO**
-1. (Done)Switch all attention weights from anti-model to the vanilla model
-2. Change only partial weights from individual attention blocks
-3. (DONE)Fine tune using full dataset
-4. hyperparameter tuning?
-5. BERT of another size
-6. Finetuning on a large amount of anti-stereo data seemed to teach the model to learn to predict anti-stereo answers. May consider train on balanced.
+1. (DONE)Switch all attention weights from anti-model to the vanilla model
+2. (DONE)Change only partial weights from individual attention blocks
+3. (DONE)Finetune using full dataset
+4. (probably skip - discussion)hyperparameter tuning?
+5. BERT of another size: analysis only
+6. Finetuning on a large amount of anti-stereo data seemed to teach the model to learn to predict anti-stereo answers. May consider train on **balanced dataset** (including anti & stereo).
 
 **Analysis TODO**
 1. compare finetuend bert result with vanilla bert result: if number of anti-stereotyped prediction increase, compare probabilities
